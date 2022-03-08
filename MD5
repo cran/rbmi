@@ -1,4 +1,4 @@
-07a8427d1ff56c4cef0646fecfe234ff *DESCRIPTION
+8ab7738f937683acc5fa7d9530bc7b12 *DESCRIPTION
 8f0a64927c4a92b2eff597082410e9a0 *NAMESPACE
 f94be20ebb88b46d508e07b38851749b *R/analyse.R
 3d6e3e7395f3114b0e990e5e19cabd82 *R/ancova.R
@@ -33,7 +33,7 @@ a6983a895cf9672cf308eb79dd2c95dd *build/vignette.rds
 1cc60bdd8610449d30184e0bb374bf46 *configure
 6bea7bdbd44ffa386677bfdec2d1984b *configure.win
 829eb8a9890293662643b06eb920cd54 *data/antidepressant_data.rda
-a04d6641a0e38af5862d178ab1165876 *inst/doc/advanced.html
+f7df5491a79ee1a631dfcaaf88833cc9 *inst/doc/advanced.html
 79945ae9115224d39c617da5e94c9f95 *inst/doc/advanced.html.asis
 48387b68b6782b5906586ee66151ed02 *inst/doc/quickstart.html
 c502d7802d429be580977478f8fcfdc7 *inst/doc/quickstart.html.asis
@@ -199,7 +199,7 @@ e3fa652165a00f73a00635ce2c194607 *tests/testthat/test-methods.R
 02e550eb7240831b2d759b1f68151802 *tests/testthat/test-misc.R
 ac45e3dda418b145985d149244b0a132 *tests/testthat/test-mmrm.R
 ba9d763524d54efeb1a43a78f7549dfe *tests/testthat/test-parallel.R
-b00c4623baaaca2843cc46dbcb4c38c2 *tests/testthat/test-pool.R
+cfe6d190c0f428d0b1d66384dd898fe8 *tests/testthat/test-pool.R
 732d7f5ff4ca0acfa8459dfa6aa24ceb *tests/testthat/test-print.R
 28303c6a7b03ebe45795c750ff37f331 *tests/testthat/test-reproducibility.R
 272681d545f09c2550a2253777f63b34 *tests/testthat/test-scaling.R
