@@ -193,7 +193,7 @@ public:
             vals_i__ = context__.vals_i("P");
             pos__ = 0;
             P = vals_i__[pos__++];
-            check_greater_or_equal(function__, "P", P, 0);
+            check_greater_or_equal(function__, "P", P, 1);
             current_statement_begin__ = 31;
             context__.validate_dims("data initialization", "G", "int", context__.to_vec());
             G = int(0);
@@ -269,6 +269,13 @@ public:
             for (size_t k_1__ = 0; k_1__ < pat_sigma_index_k_1_max__; ++k_1__) {
                 for (size_t k_0__ = 0; k_0__ < pat_sigma_index_k_0_max__; ++k_0__) {
                     pat_sigma_index[k_0__][k_1__] = vals_i__[pos__++];
+                }
+            }
+            size_t pat_sigma_index_i_0_max__ = n_pat;
+            size_t pat_sigma_index_i_1_max__ = n_visit;
+            for (size_t i_0__ = 0; i_0__ < pat_sigma_index_i_0_max__; ++i_0__) {
+                for (size_t i_1__ = 0; i_1__ < pat_sigma_index_i_1_max__; ++i_1__) {
+                    check_greater_or_equal(function__, "pat_sigma_index[i_0__][i_1__]", pat_sigma_index[i_0__][i_1__], 1);
                 }
             }
             current_statement_begin__ = 40;
