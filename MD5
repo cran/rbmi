@@ -1,6 +1,6 @@
-fda1a684df094cfe4d80130ada113153 *DESCRIPTION
+b2e0ebe46a05bc71b4b8d47fc56f941e *DESCRIPTION
 27fd8e63becd19105ace6b6cbab3ed88 *NAMESPACE
-eeec47b72b973c0d183ae47ef4ee809c *NEWS.md
+c43f148734519b99a64b916f38ba12d4 *NEWS.md
 f94be20ebb88b46d508e07b38851749b *R/analyse.R
 3d6e3e7395f3114b0e990e5e19cabd82 *R/ancova.R
 42db3bf8fdf68d735ef29e9ea34e8d4e *R/as_ascii_table.R
@@ -16,7 +16,7 @@ cf071f5d55d7f750f61db7a1b55edd11 *R/draws.R
 26a83a4050832cae9a029b3d2db42b56 *R/mcmc.R
 107f24fcb04e2aa91004d1b986974a2b *R/methods.R
 cdc66504c7021b95347fd259a9d55a7a *R/mmrm.R
-4f94b0bb7eab0b8522ae6cc457cc617d *R/parallel.R
+d3772a65ed31edd3eb324a22e7783952 *R/parallel.R
 ec8f23e5b5c4df0895e3711dfc430fbd *R/pool.R
 764cc88d08b1331f3e1007bf823e58c6 *R/rbmi.R
 a4c21b82bab0e8a7582bdb9aafd3befa *R/scaling.R
@@ -26,7 +26,7 @@ b676097f1b4d748524842c85b9e27d74 *R/simulate_data.R
 a2bfad6f41b98c0e7c16fec45b9694b9 *R/stanmodels.R
 ab40ccd790d7fc2e07641974f2f5cb48 *R/strategies.R
 95d6dd346c870fe4ec78f63a0c0a56ef *R/sysdata.rda
-6bbe5b8dca0a28a04959c39d924905df *R/utilities.R
+10bf57843a69bf6c6037307bd4390903 *R/utilities.R
 c5d5fd59a9a4cd24081934ec13b5753b *R/validate.R
 245796703cdf130f918e11fc11e6a7f4 *R/validate_datalong.R
 f388f4bea574630b7618c68959c578ea *README.md
@@ -76,6 +76,7 @@ cc25d43d591144e718776c0644283fa6 *man/check_mcmc.Rd
 850a0840076d29ea2b93de31af3e36a6 *man/convert_to_imputation_list_df.Rd
 eedbaaa866fa4e12a88d60669de0b747 *man/d_lagscale.Rd
 7011012fa7c4c5e3f5ab4ecb51909fcf *man/delta_template.Rd
+4a904c71560562d26d873c1d79e2c258 *man/do_not_run.Rd
 58cf549b4fbc8749faf15f3ad0ab6dca *man/draws.Rd
 89634a7913a91ffa847b8aa2f8da7f1d *man/encap_get_mmrm_sample.Rd
 3371b39e4133e8db93027f5710368ca9 *man/eval_mmrm.Rd
@@ -198,8 +199,8 @@ abdb7ad50247cf814ba3e24f879cf158 *tests/testthat/test-lsmeans.R
 dc9c7c4acc8a64a3bd607f2957b75d92 *tests/testthat/test-mcmc.R
 e3fa652165a00f73a00635ce2c194607 *tests/testthat/test-methods.R
 02e550eb7240831b2d759b1f68151802 *tests/testthat/test-misc.R
-383920f20fdd605399e2f285d45c089c *tests/testthat/test-mmrm.R
-3b6a8215b5fa43235cdb64c743da2bca *tests/testthat/test-parallel.R
+7def03283aae70e0a2987f5181e4b84c *tests/testthat/test-mmrm.R
+d66882caf7acac44d1609ca97a3efb1e *tests/testthat/test-parallel.R
 cfe6d190c0f428d0b1d66384dd898fe8 *tests/testthat/test-pool.R
 732d7f5ff4ca0acfa8459dfa6aa24ceb *tests/testthat/test-print.R
 136d0329c6a4b3374ad5047af5debf44 *tests/testthat/test-reproducibility.R

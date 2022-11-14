@@ -334,6 +334,8 @@ test_that("MMRM returns expected estimates (same_cov = FALSE)", {
 
 test_that("MMRM returns expected estimates under different model specifications", {
 
+    testthat::skip_on_cran()
+
     set.seed(101)
 
     sigma <- as_vcov(c(5, 3, 8), c(0.4, 0.6, 0.3))
