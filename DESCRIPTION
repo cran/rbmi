@@ -1,6 +1,6 @@
 Package: rbmi
 Title: Reference Based Multiple Imputation
-Version: 1.2.5
+Version: 1.2.6
 Authors@R: c(
     person("Craig", "Gower-Page", email = "craig.gower-page@roche.com", role = c("aut", "cre")),
     person("Alessandro", "Noci", email = "alessandro.noci@roche.com", role = c("aut")),
@@ -34,11 +34,11 @@ Depends: R (>= 3.4.0)
 License: Apache License (>= 2)
 VignetteBuilder: R.rsp
 NeedsCompilation: yes
-Packaged: 2023-09-20 14:17:17 UTC; gowerc
+Packaged: 2023-11-24 13:29:25 UTC; gowerc
 Author: Craig Gower-Page [aut, cre],
   Alessandro Noci [aut],
   Marcel Wolbers [ctb],
   Roche [cph, fnd]
 Maintainer: Craig Gower-Page <craig.gower-page@roche.com>
 Repository: CRAN
-Date/Publication: 2023-09-20 23:20:02 UTC
+Date/Publication: 2023-11-24 14:00:03 UTC

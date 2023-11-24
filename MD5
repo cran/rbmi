@@ -1,6 +1,6 @@
-c39bf8c968e89f13e749b319c9c9e910 *DESCRIPTION
+f4b82955086ae434465afaa816606fc6 *DESCRIPTION
 bf7a5dc2f6d48aaa21602e27b9a37e6d *NAMESPACE
-1afea1b9e139fa4a620ea91a8a1a4fac *NEWS.md
+060cec9591e18fbe0f3723b1a0557e50 *NEWS.md
 f94be20ebb88b46d508e07b38851749b *R/analyse.R
 3d6e3e7395f3114b0e990e5e19cabd82 *R/ancova.R
 42db3bf8fdf68d735ef29e9ea34e8d4e *R/as_ascii_table.R
@@ -30,7 +30,7 @@ efd02eda81e0a25c8a229eb2e27f088c *R/utilities.R
 c5d5fd59a9a4cd24081934ec13b5753b *R/validate.R
 245796703cdf130f918e11fc11e6a7f4 *R/validate_datalong.R
 743512ee662003799389108adb241fa9 *README.md
-82a22b9e1711b0781ed74f3993ad85e1 *build/vignette.rds
+66f490e5e1aadeb43e96f29786fc6a1b *build/vignette.rds
 1cc60bdd8610449d30184e0bb374bf46 *configure
 6bea7bdbd44ffa386677bfdec2d1984b *configure.win
 829eb8a9890293662643b06eb920cd54 *data/antidepressant_data.rda
@@ -179,7 +179,6 @@ a70f91db73663e5792ae08e7350dc778 *man/validate_analyse_pars.Rd
 790c89029fd428166b4e6c35d9b904c7 *man/validate_datalong.Rd
 e6064b1094d8d0fd4ff3084580087b34 *man/validate_strategies.Rd
 564c40d0e86bb1e58d039ff240e97b9f *src/Makevars
-66d6aef607935be5ead2bd71ebf6e98f *src/Makevars.win
 17ea823c83d1844845b971d94dd7eaee *src/RcppExports.cpp
 6c00cc9663cff559d8569665e7257f54 *src/stanExports_MMRM.cc
 147cef9ca5384bbd25f2b6eec39e1283 *src/stanExports_MMRM.h
@@ -192,14 +191,14 @@ e45a154fb42365fbf6474ec0ecf40276 *tests/testthat/helper-mice.R
 391ae4b2aaeceb3811fd93e95954dcb5 *tests/testthat/test-delta.R
 1be4a95c63359ee42f1cdf21f9bfed7a *tests/testthat/test-draws.R
 ff9aec9c549ce3173bd8ad8b09278dfe *tests/testthat/test-expand.R
-8dcbb0b08dfa707e422818647c56b09d *tests/testthat/test-fullusage.R
+5887fd7774fe7667b10e7912d63183b9 *tests/testthat/test-fullusage.R
 829db77f5e57b054a407890eb5e24f54 *tests/testthat/test-impute.R
 a4ec5c806f3f7f260abdf28334aaede6 *tests/testthat/test-longData.R
 abdb7ad50247cf814ba3e24f879cf158 *tests/testthat/test-lsmeans.R
 c38fd0a339b07057998fde5421028c6c *tests/testthat/test-mcmc.R
 e3fa652165a00f73a00635ce2c194607 *tests/testthat/test-methods.R
 02e550eb7240831b2d759b1f68151802 *tests/testthat/test-misc.R
-7def03283aae70e0a2987f5181e4b84c *tests/testthat/test-mmrm.R
+b0c4be849f50b4bd2fb0dc64ee972a16 *tests/testthat/test-mmrm.R
 d66882caf7acac44d1609ca97a3efb1e *tests/testthat/test-parallel.R
 cfe6d190c0f428d0b1d66384dd898fe8 *tests/testthat/test-pool.R
 732d7f5ff4ca0acfa8459dfa6aa24ceb *tests/testthat/test-print.R
