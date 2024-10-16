@@ -4,13 +4,12 @@ status](https://www.r-pkg.org/badges/version/rbmi)](https://cran.r-project.org/p
 [![R-CMD-check](https://github.com/insightsengineering/rbmi/actions/workflows/on_push.yaml/badge.svg?branch=main)](https://github.com/insightsengineering/rbmi/actions/workflows/on_push.yaml)
 <!-- badges: end -->
 
-
-# Reference Based Multiple Imputation (rbmi)
+# Reference Based Multiple Imputation (`rbmi`) <a href='https://insightsengineering.github.io/rbmi/'><img src="man/figures/logo.png" align="right" height="139" style="max-width: 100%; max-height: 139px;"/></a  >
 
 
 ## Overview
 
-rbmi is a R package for imputation of missing data in clinical trials with continuous multivariate normal longitudinal outcomes. 
+The `rbmi` package is used for the imputation of missing data in clinical trials with continuous multivariate normal longitudinal outcomes. 
 It supports imputation under a missing at random (MAR) assumption, reference-based imputation methods, 
 and delta adjustments (as required for sensitivity analysis such as tipping point analyses). The package implements both Bayesian and 
 approximate Bayesian multiple imputation combined with Rubin's rules for inference, and frequentist conditional mean imputation combined with 
@@ -22,6 +21,12 @@ The package can be installed directly from CRAN via:
 
 ```
 install.packages("rbmi")
+```
+
+Note that the usage of Bayesian multiple imputation requires the installation of the suggested 
+package [rstan](https://CRAN.R-project.org/package=rstan).
+```
+install.packages("rstan")
 ```
 
 ## Usage
@@ -38,6 +43,11 @@ The basic usage of these core functions is described in the quickstart vignette:
 ```
 vignette(topic = "quickstart", package = "rbmi")
 ```
+
+## Validation
+
+For clarification on the current validation status of `rbmi` please see the FAQ vignette.
+
 
 ## Support
 

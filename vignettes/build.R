@@ -25,3 +25,21 @@ rmarkdown::render(
     output_file = "advanced.html"
 )
 
+rmarkdown::render(
+    input = "./vignettes/CondMean_Inference.Rmd",
+    output_dir = "./vignettes/",
+    output_file = "CondMean_Inference.html"
+)
+
+rmarkdown::render(
+    input = "./vignettes/FAQ.Rmd",
+    output_dir = "./vignettes/",
+    output_file = "FAQ.html"
+)
+
+rmarkdown::render(
+    input = "./vignettes/retrieved_dropout.Rmd",
+    output_dir = "./vignettes/",
+    output_file = "retrieved_dropout.html"
+)
+

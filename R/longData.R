@@ -257,7 +257,7 @@ longDataConstructor <- R6::R6Class(
 
             if (idmap & !orig_data_flag) {
                 new_ids_single <- vapply(
-                    seq_along(indexes), 
+                    seq_along(indexes),
                     function(x) paste0("new_pt_", x),
                     character(1)
                 )
@@ -383,7 +383,7 @@ longDataConstructor <- R6::R6Class(
         #' of post-ICE observations.
         #' @param dat_ice a `data.frame` containing ICE information. See details.
         #' @param update Logical, indicates that the ICE data should be used as an update. See details.
-        set_strategies = function(dat_ice = NULL, update=FALSE) {
+        set_strategies = function(dat_ice = NULL, update = FALSE) {
 
 
 
@@ -397,6 +397,8 @@ longDataConstructor <- R6::R6Class(
 
             dat_ice <- sort_by(dat_ice, c(self$vars$subjid))
 
+            has_nonMAR_to_MAR <- FALSE
+
             for (subject in dat_ice[[self$vars$subjid]]) {
 
                 dat_ice_pt <- dat_ice[dat_ice[[self$vars$subjid]] == subject, ]
@@ -408,7 +410,6 @@ longDataConstructor <- R6::R6Class(
 
                 new_strategy <- dat_ice_pt[[self$vars$strategy]]
 
-                has_nonMAR_to_MAR <- FALSE
                 if (!update) {
                     visit <- dat_ice_pt[[self$vars$visit]]
                     self$ice_visit_index[[subject]] <- which(self$visits == visit)
@@ -450,7 +451,7 @@ longDataConstructor <- R6::R6Class(
                 validate(as_class(self$is_mar[[subject]], "is_mar"))
             }
 
-            if(has_nonMAR_to_MAR) {
+            if (has_nonMAR_to_MAR) {
                 warning(paste(
                     "Updating strategies from non-MAR to MAR for subjects with post-ICE data means",
                     "that the imputation model has been fitted without using all of the available data.",
