@@ -1,4 +1,8 @@
 
+# rbmi 1.3.1
+
+* Fixed bug where stale caches of the `rstan` model were not being correctly cleared (#459)
+
 # rbmi 1.3.0
 
 ## Breaking Changes
