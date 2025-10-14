@@ -22,8 +22,9 @@ functions {
         }
         return(res);
     }
-}
 
+    {{ functions }}
+}
 
 data {
     int<lower=1> N;                         // number of observations
@@ -40,30 +41,32 @@ data {
     vector[N] y;                            // outcome variable
     matrix[N,P] Q;                          // design matrix (After QR decomp)
     matrix[P,P] R;                          // R matrix (from QR decomp)
-    array[G] matrix[n_visit, n_visit] Sigma_init; // covariance matrix estimated from MMRM
-}
 
+    {{ data }}
+}
 
 transformed data {
    matrix[P, P] R_inverse = inverse(R);
+
+   {{ transformed_data }}
 }
-
-
 
 parameters {
     vector[P] theta;              // coefficients of linear model on covariates
-    array[G] cov_matrix[n_visit] Sigma; // covariance matrix(s)
+
+    {{ parameters }}       
 }
 
+transformed parameters {
+    {{ transformed_parameters}}
+}
 
 model {
     int data_start_row = 1;
     
-    vector[N] mu =  Q * theta;
+    vector[N] mu = Q * theta;
     
-    for(g in 1:G){
-        Sigma[g] ~ inv_wishart(n_visit+2, Sigma_init[g]);
-    }
+    {{ model }}
     
     for(i in 1:n_pat) {
         // Index + size variables for current pat group
@@ -88,7 +91,6 @@ model {
         data_start_row = data_stop_row + 1;
     }
 }
-
 
 generated quantities {
    vector[P] beta = R_inverse * theta; 

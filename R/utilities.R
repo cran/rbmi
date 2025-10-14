@@ -1,4 +1,3 @@
-
 #' Set Class
 #'
 #' Utility function to set an objects class.
@@ -65,7 +64,6 @@ as_simple_formula <- function(outcome, covars) {
 }
 
 
-
 #' Expand `data.frame` into a design matrix
 #'
 #' Expands out a `data.frame` using a formula to create a design matrix.
@@ -78,7 +76,6 @@ as_simple_formula <- function(outcome, covars) {
 #' @param dat a data.frame
 #' @param frm a formula
 as_model_df <- function(dat, frm) {
-
     outcome <- as.character(attr(stats::terms(frm), "variables")[[2]])
     is_missing <- is.na(dat[[outcome]])
     dat[[outcome]][is_missing] <- 999
@@ -96,7 +93,6 @@ as_model_df <- function(dat, frm) {
     class(design) <- class(dat)
     return(design)
 }
-
 
 
 #' Convert character variables to factor
@@ -123,7 +119,6 @@ char2fct <- function(data, vars = NULL) {
 }
 
 
-
 #' if else
 #'
 #' A wrapper around `if() else()` to prevent unexpected
@@ -144,7 +139,6 @@ ife <- function(x, a, b) {
         return(b)
     }
 }
-
 
 
 #' Sample random values from the multivariate normal distribution
@@ -170,7 +164,6 @@ sample_mvnorm <- function(mu, sigma) {
     x <- rnorm(nrow(sigma), mean = 0, sd = 1)
     (x %*% chol(sigma)) + as.vector(mu)
 }
-
 
 
 #' Capture all Output
@@ -258,7 +251,6 @@ is_absent <- function(x, na = TRUE, blank = TRUE) {
 }
 
 
-
 #' Extract Variables from string vector
 #'
 #' Takes a string including potentially model terms like `*` and `:` and
@@ -268,14 +260,15 @@ is_absent <- function(x, na = TRUE, blank = TRUE) {
 #'
 #' @param x string of variable names potentially including interaction terms
 extract_covariates <- function(x) {
-    if (is.null(x)) return(x)
+    if (is.null(x)) {
+        return(x)
+    }
     x_split <- strsplit(x, ":|\\*")
     x_vec <- unlist(x_split, use.names = FALSE)
     x_nws <- trimws(x_vec)
     x_uni <- unique(x_nws)
     return(x_uni)
 }
-
 
 
 #' Does a string contain a substring
@@ -295,15 +288,18 @@ extract_covariates <- function(x) {
 str_contains <- function(x, subs) {
     strings <- x
     res_list <- lapply(subs, function(x) grepl(x, strings, fixed = TRUE))
-    res_matrix <- matrix(unlist(res_list), nrow = length(res_list), byrow = TRUE)
-    res <- unlist(apply(res_matrix, MARGIN = 2, any, simplify = FALSE), use.names = TRUE)
+    res_matrix <- matrix(
+        unlist(res_list),
+        nrow = length(res_list),
+        byrow = TRUE
+    )
+    res <- unlist(
+        apply(res_matrix, MARGIN = 2, any, simplify = FALSE),
+        use.names = TRUE
+    )
     assert_that(length(res) == length(strings))
     return(res)
 }
-
-
-
-
 
 
 #' Sort `data.frame`
@@ -335,9 +331,6 @@ sort_by <- function(df, vars = NULL, decreasing = FALSE) {
     assert_that(nrow(df) == nrow(df2), ncol(df) == ncol(df2))
     return(df2)
 }
-
-
-
 
 
 #' Set key variables
@@ -421,7 +414,6 @@ set_vars <- function(
 }
 
 
-
 #' Validate inputs for `vars`
 #'
 #' Checks that the required variable names are defined within `vars` and
@@ -431,7 +423,6 @@ set_vars <- function(
 #' @param ... not used
 #' @export
 validate.ivars <- function(x, ...) {
-
     assert_that(
         is_char_one(x$outcome),
         msg = "`vars$outcome` should be a length 1 character"
@@ -549,7 +540,6 @@ as_dataframe <- function(x) {
 }
 
 
-
 #' Ensure `rstan` exists
 #'
 #' Checks to see if rstan exists and if not throws a helpful error message
@@ -568,7 +558,7 @@ ensure_rstan <- function() {
 }
 
 #' Get session hash
-#' 
+#'
 #' Gets a unique string based on the current R version and relevant packages.
 #' @importFrom utils sessionInfo
 #' @keywords internal
@@ -578,7 +568,10 @@ get_session_hash <- function() {
         function(x) x[["Version"]],
         character(1L)
     )
-    version_string <- paste0(R.version.string, paste0(names(pkg_versions), pkg_versions, collapse = ":"))
+    version_string <- paste0(
+        R.version.string,
+        paste0(names(pkg_versions), pkg_versions, collapse = ":")
+    )
     temp_file <- tempfile()
     writeLines(version_string, temp_file)
     hash <- tools::md5sum(temp_file)
@@ -586,18 +579,190 @@ get_session_hash <- function() {
     return(hash)
 }
 
-clear_model_cache <- function(cache_dir = getOption("rbmi.cache_dir")) {
-    files <- list.files(cache_dir, pattern = "(rbmi_MMRM_).*(\\.stan|\\.rds)", full.names = TRUE)
-    unlink(files)
+#' Clear Model Cache
+#'
+#' Clears the compiled Stan model cache, keeping only the models that match the `keep` argument.
+#'
+#' @param keep A character string that specifies which models to keep in the cache.
+#' @param cache_dir The directory where the compiled Stan models are cached. Defaults to the option `rbmi.cache_dir`.
+#' @return See [unlink()] for details on the return value regarding the deletion of the old model files.
+#'
+#' @keywords internal
+clear_model_cache <- function(keep, cache_dir = getOption("rbmi.cache_dir")) {
+    assert_that(assertthat::is.string(keep))
+    all_model_files <- list.files(
+        cache_dir,
+        pattern = "(rbmi_MMRM_).*(\\.stan|\\.rds)",
+        full.names = TRUE
+    )
+    should_keep <- grepl(pattern = keep, x = all_model_files, fixed = TRUE)
+    old_model_files <- all_model_files[!should_keep]
+    unlink(old_model_files)
 }
 
+#' List of Stan Blocks
+#'
+#' @description
+#' A list with 1 element per standard Stan program blocks.
+#' This object is mostly used internally as a reference for
+#' what blocks are parsed from a covariance / prior Stan definition file.
+STAN_BLOCKS <- list(
+    functions = "functions",
+    data = "data",
+    parameters = "parameters",
+    transformed_data = "transformed data",
+    transformed_parameters = "transformed parameters",
+    model = "model"
+)
+
+#' Conversion of Character Vector into Stan Code Block List
+#'
+#' @param x the single Stan code vector.
+#' @param stan_blocks reference list of stan blocks.
+#'
+#' @return A list with the Stan code blocks.
+#'
+#' @author Craig Gower-Page (from `jmpost` R package)
+#' @details
+#' Function only works if code is in format
+#' ```
+#' data {
+#'     <code>
+#' }
+#' model {
+#'     <code>
+#' }
+#' ```
+#' That is to say we do not support code in inline format i.e.
+#' ```
+#' data { <code> }
+#' model { <code> }
+#' ```
+#'
+#' @keywords internal
+as_stan_fragments <- function(x, stan_blocks = STAN_BLOCKS) {
+    code <- unlist(stringr::str_split(x, "\n"))
+
+    errmsg <- paste(
+        "There were problems parsing the `%s` block.",
+        "Please report this as a bug."
+    )
+
+    # Check to see if any block openings exist that have code on the same line
+    # e.g.  `data { int i;}`. This is unsupported so we throw an error
+    for (block in stan_blocks) {
+        regex <- sprintf("^\\s*%s\\s*\\{\\s*[^\\s-]+", block)
+        if (any(grepl(regex, code, perl = TRUE))) {
+            stop(sprintf(errmsg, block))
+        }
+    }
+
+    # We first look to identify the opening of a block e.g.  `data {`
+    # We then regard all lines that follow as belonging to that block
+    # until we see another block being opened e.g. `model{`
+    results <- list()
+    target <- NULL
+    for (line in code) {
+        for (block in names(stan_blocks)) {
+            regex <- sprintf("^\\s*%s\\s*\\{\\s*$", stan_blocks[[block]])
+            if (stringr::str_detect(line, regex)) {
+                target <- block
+                line <- NULL
+                break
+            }
+        }
+        if (!is.null(target)) {
+            # This is memory inefficient but given the relatively small size of
+            # stan files its regarded as a acceptable simplification to ease the
+            # code burden
+            results[[target]] <- c(results[[target]], line)
+        }
+    }
+
+    # Loop over each block to remove trailing "}".
+    for (block in names(results)) {
+        block_length <- length(results[[block]])
+        # The following processing is only required if the block actually has content
+        if (block_length == 1 && results[[block]] == "") {
+            next
+        }
+        has_removed_char <- FALSE
+        # Walk backwards to find the closing `}` that corresponds to the `<block> {`
+        for (index in rev(seq_len(block_length))) {
+            line <- results[[block]][[index]]
+            # This code will exit the for loop as soon as it hits the closing `}`
+            # thus if we ever see a line that ends in text/numbers it means
+            # somethings gone wrong
+            if (stringr::str_detect(line, "[\\w\\d]+\\s*$")) {
+                stop(sprintf(errmsg, block))
+            }
+            if (stringr::str_detect(line, "\\}\\s*$")) {
+                new_line <- stringr::str_replace(line, "\\s*\\}\\s*$", "")
+                # If the line is now blank after removing the closing `}` then drop the line
+                keep_offset <- if (nchar(new_line) == 0) -1 else 0
+                # Only keep lines from the start of the block to the closing `}`
+                # this is to ensure we drop blank lines that were between the end
+                # of the block and the start of the next
+                keep_range <- seq_len(index + keep_offset)
+                results[[block]][[index]] <- new_line
+                results[[block]] <- results[[block]][keep_range]
+                has_removed_char <- TRUE
+                break
+            }
+        }
+        # If we haven't actually removed a closing `}` then something has gone wrong...
+        if (!has_removed_char) {
+            stop(sprintf(errmsg, block))
+        }
+    }
+
+    # Add any missing blocks back in
+    for (block in names(stan_blocks)) {
+        if (is.null(results[[block]])) {
+            results[[block]] <- ""
+        }
+    }
+    results
+}
+
+#' Find Stan File
+#'
+#' Finds a Stan file either in the local `inst/stan` directory or in the system package directory.
+#'
+#' @param file The name of the Stan file to find.
+#' @param subdir Optional subdirectory within `inst/stan` where the file might be located.
+#' @return The full path to the Stan file if found, otherwise an error is raised.
+#'
+#' @keywords internal
+find_stan_file <- function(file, subdir = "") {
+    assert_that(assertthat::is.string(file))
+    assert_that(assertthat::is.string(subdir))
+
+    local_file <- file.path("inst", "stan", subdir, file)
+    system_file <- system.file(
+        file.path("stan", subdir, file),
+        package = "rbmi"
+    )
+    if (file.exists(local_file)) {
+        local_file
+    } else if (file.exists(system_file)) {
+        system_file
+    } else {
+        stop(paste0("Unable to find ", file, "; Please report this as a bug"))
+    }
+}
 
 #' Get Compiled Stan Object
 #'
-#' Gets a compiled Stan object that can be used with `rstan::sampling()`
+#' Gets a compiled Stan object that can be used with `rstan::sampling()`,
+#' based on the choice of the covariance structure and the prior on the parameters.
+#'
+#' @param covariance A string indicating the covariance structure to be used.
+#' @param prior_cov A string indicating the prior on the covariance parameters.
+#' @return The compiled Stan model object.
+#'
 #' @keywords internal
-get_stan_model <- function() {
-
+get_stan_model <- function(covariance, prior_cov) {
     # Compiling Stan models updates the current seed state. This can lead to
     # non-reproducibility as compiling is conditional on wether there is a cached
     # model available or not. Thus we save the current seed state and restore it
@@ -608,42 +773,82 @@ get_stan_model <- function() {
     # has been generated.
     current_seed_state <- globalenv()$.Random.seed
     on.exit({
-        if (is.null(current_seed_state) && exists(".Random.seed", envir = globalenv())) {
+        if (
+            is.null(current_seed_state) &&
+                exists(".Random.seed", envir = globalenv())
+        ) {
             rm(".Random.seed", envir = globalenv(), inherits = FALSE)
         } else {
-            assign(".Random.seed", value = current_seed_state, envir = globalenv(), inherits = FALSE)
+            assign(
+                ".Random.seed",
+                value = current_seed_state,
+                envir = globalenv(),
+                inherits = FALSE
+            )
         }
     })
 
     ensure_rstan()
-    local_file <- file.path("inst", "stan", "MMRM.stan")
-    system_file <- system.file(file.path("stan", "MMRM.stan"), package = "rbmi")
-    file_loc <- if (file.exists(local_file)) {
-        local_file
-    } else if (file.exists(system_file)) {
-        system_file
-    } else {
-        stop("Unable to find MMRM.stan; Please report this as a bug")
-    }
-    cache_dir <- getOption("rbmi.cache_dir")
-    dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
-    model_file <- file.path(cache_dir, paste0("rbmi_MMRM_", get_session_hash(), ".stan"))
 
-    if (!file.exists(model_file)) {
-        clear_model_cache()
-        file.copy(file_loc, model_file, overwrite = TRUE)
-    }
-
-    model <- rstan::stan_model(
-        file = model_file,
-        auto_write = getOption("rbmi.enable_cache"),
-        model_name = "rbmi_mmrm"
+    # Find the correct MMRM and covariance prior model Stan files.
+    file_loc_mmrm <- find_stan_file("MMRM.stan")
+    cov_prior_file <- paste0(covariance, "_", prior_cov, ".stan")
+    file_loc_cov_prior <- find_stan_file(
+        cov_prior_file,
+        subdir = "covariance_priors"
     )
 
-    return(model)
+    # Replace constants in the covariance prior file and parse it
+    # into a list of Stan code blocks.
+    cov_prior_template <- jinjar::parse_template(
+        fs::path(file_loc_cov_prior)
+    )
+    cov_prior_string <- jinjar::render(
+        .x = cov_prior_template,
+        machine_double_eps = .Machine$double.eps
+    )
+    cov_prior_blocks <- as_stan_fragments(cov_prior_string)
+    cov_prior_blocks <- lapply(cov_prior_blocks, paste, collapse = "\n")
+
+    # Decide file location for the final Stan model file.
+    cache_dir <- getOption("rbmi.cache_dir")
+    dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
+    session_hash <- get_session_hash()
+    model_name <- paste0("rbmi_MMRM_", covariance, "_", prior_cov)
+    file_name <- paste0(model_name, "_", session_hash, ".stan")
+    model_file <- file.path(cache_dir, file_name)
+
+    # If it does not exist yet, create the model file from the template
+    # and save it to the cache directory.
+    if (!file.exists(model_file)) {
+        model_template <- jinjar::parse_template(
+            fs::path(file_loc_mmrm),
+            .config = jinjar::jinjar_config(
+                trim_blocks = TRUE,
+                lstrip_blocks = TRUE
+            )
+        )
+        model_data <- c(
+            cov_prior_blocks,
+            machine_double_eps = .Machine$double.eps
+        )
+        model_string <- do.call(
+            jinjar::render,
+            c(
+                list(.x = model_template),
+                model_data
+            )
+        )
+        clear_model_cache(keep = session_hash)
+        writeLines(model_string, model_file)
+    }
+
+    rstan::stan_model(
+        file = model_file,
+        auto_write = getOption("rbmi.enable_cache"),
+        model_name = model_name
+    )
 }
-
-
 
 #' rbmi settings
 #'
@@ -671,11 +876,11 @@ get_stan_model <- function() {
 #' ```
 #' options("rbmi.cache_dir" = tempdir(check = TRUE))
 #' ```
-#' 
+#'
 #' ## `rbmi.enable_cache`
-#' 
+#'
 #' Default = `TRUE`
-#' 
+#'
 #' If `TRUE` then the package will attempt to cache compiled Stan models to the
 #' `rbmi.cache_dir` directory. If `FALSE` then the package will re-compile the
 #' Stan model each time it is required. If the environment variable `RBMI_ENABLE_CACHE`
@@ -687,9 +892,14 @@ get_stan_model <- function() {
 #' }
 #' @name rbmi-settings
 set_options <- function() {
-
-    cache_dir <- Sys.getenv("RBMI_CACHE_DIR", unset = tools::R_user_dir("rbmi", which = "cache"))
-    enable_cache <- isTRUE(as.logical(Sys.getenv("RBMI_ENABLE_CACHE", unset = "TRUE")))
+    cache_dir <- Sys.getenv(
+        "RBMI_CACHE_DIR",
+        unset = tools::R_user_dir("rbmi", which = "cache")
+    )
+    enable_cache <- isTRUE(as.logical(Sys.getenv(
+        "RBMI_ENABLE_CACHE",
+        unset = "TRUE"
+    )))
 
     current_opts <- names(options())
     rbmi_opts <- list(

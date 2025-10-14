@@ -1,9 +1,9 @@
 Package: rbmi
 Title: Reference Based Multiple Imputation
-Version: 1.4.1
+Version: 1.5.1
 Authors@R: c(
-    person("Isaac", "Gravestock", email = "isaac.gravestock@roche.com", role = c("aut", "cre")),
-    person("Craig", "Gower-Page", email = "craig.gower-page@roche.com", role = c("aut")),
+    person("Craig", "Gower-Page", email = "craig.gower-page@novartis.com", role = c("aut", "cre")),
+    person("Isaac", "Gravestock", email = "isaac.gravestock@roche.com", role = c("aut")),
     person("Alessandro", "Noci", email = "alessandro.noci@roche.com", role = c("aut")),
     person("Marcel", "Wolbers", email = "marcel.wolbers@roche.com", role = "ctb"),
     person("Daniel", "Sabanes Bove", email = "daniel.sabanes_bove@rconis.com", role = c("aut")),
@@ -20,23 +20,24 @@ LazyData: true
 URL: https://insightsengineering.github.io/rbmi/,
         https://github.com/insightsengineering/rbmi
 BugReports: https://github.com/insightsengineering/rbmi/issues
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Suggests: dplyr, tidyr, nlme, testthat, emmeans, tibble, mvtnorm,
         knitr, rmarkdown, bookdown, lubridate, purrr, ggplot2, rstan
-        (>= 2.26.0), R.rsp
+        (>= 2.26.0), R.rsp, withr
 Config/testthat/edition: 3
-Imports: mmrm, pkgload, Matrix, tools, methods, R6, assertthat
+Imports: mmrm, pkgload, Matrix, tools, methods, R6, assertthat, jinjar,
+        fs, stringr
 Depends: R (>= 3.4.0)
 License: Apache License (>= 2)
 VignetteBuilder: R.rsp
 NeedsCompilation: no
-Packaged: 2025-02-21 12:08:31 UTC; gravesti
-Author: Isaac Gravestock [aut, cre],
-  Craig Gower-Page [aut],
+Packaged: 2025-10-10 08:49:21 UTC; gowercr1
+Author: Craig Gower-Page [aut, cre],
+  Isaac Gravestock [aut],
   Alessandro Noci [aut],
   Marcel Wolbers [ctb],
   Daniel Sabanes Bove [aut],
   F. Hoffmann-La Roche AG [cph, fnd]
-Maintainer: Isaac Gravestock <isaac.gravestock@roche.com>
+Maintainer: Craig Gower-Page <craig.gower-page@novartis.com>
 Repository: CRAN
-Date/Publication: 2025-03-03 20:10:02 UTC
+Date/Publication: 2025-10-14 11:00:02 UTC

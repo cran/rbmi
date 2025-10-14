@@ -1,5 +1,3 @@
-
-
 suppressPackageStartupMessages({
     library(dplyr)
     library(testthat)
@@ -36,19 +34,113 @@ expect_pool_est <- function(po, expected, param = "trt_visit_3") {
     }
 }
 
+advanced_bayes_test <- function(cov_struct, ...) {
+    dat <- get_sim_data(bign, sigma, trt = 8) %>%
+        mutate(is_miss = rbinom(n(), 1, 0.5)) %>%
+        mutate(
+            outcome = if_else(
+                is_miss == 1 & visit == "visit_3",
+                NA_real_,
+                outcome
+            )
+        ) %>%
+        select(-is_miss)
 
+    dat_ice <- dat %>%
+        group_by(id) %>%
+        arrange(id, visit) %>%
+        filter(is.na(outcome)) %>%
+        slice(1) %>%
+        ungroup() %>%
+        select(id, visit) %>%
+        mutate(strategy = "MAR")
+
+    vars <- set_vars(
+        outcome = "outcome",
+        group = "group",
+        strategy = "strategy",
+        subjid = "id",
+        visit = "visit",
+        covariates = c("age", "sex", "visit * group")
+    )
+
+    drawobj <- draws(
+        data = dat,
+        data_ice = dat_ice,
+        vars = vars,
+        method = method_bayes(
+            n_samples = nsamp * 2,
+            covariance = cov_struct,
+            control = control_bayes(init = "mmrm"),
+            ...
+        ),
+        quiet = TRUE,
+        ncores = NCORES
+    )
+
+    ### Check to see if updating ice works and if it impacts the original values
+    updated_ice <- dat_ice %>%
+        mutate(strategy = "JR")
+
+    imputeobj_upd <- impute(
+        draws = drawobj,
+        references = c("A" = "B", "B" = "B"),
+        update_strategy = updated_ice
+    )
+
+    imputeobj <- impute(
+        draws = drawobj,
+        references = c("A" = "B", "B" = "B")
+    )
+
+    vars2 <- vars
+    vars2$covariates <- c("age", "sex")
+
+    anaobj <- analyse(
+        imputeobj,
+        fun = rbmi::ancova,
+        vars = vars2,
+        visits = "visit_3"
+    )
+
+    anaobj_upd <- analyse(
+        imputeobj_upd,
+        fun = rbmi::ancova,
+        vars = vars2,
+        visits = "visit_3"
+    )
+
+    poolobj_upd <- pool(
+        results = anaobj_upd,
+        conf.level = 0.99,
+        alternative = "two.sided"
+    )
+
+    poolobj <- pool(
+        results = anaobj,
+        conf.level = 0.99,
+        alternative = "two.sided"
+    )
+
+    expect_pool_est(poolobj_upd, 4)
+    expect_pool_est(poolobj, 8)
+}
 
 test_that("Basic Usage - Approx Bayes", {
-
     skip_if_not(is_full_test())
 
     set.seed(1512)
 
     dat <- get_sim_data(bign, sigma, trt = 8) %>%
         mutate(is_miss = rbinom(n(), 1, 0.5)) %>%
-        mutate(outcome = if_else(is_miss == 1 & visit == "visit_3", NA_real_, outcome)) %>%
+        mutate(
+            outcome = if_else(
+                is_miss == 1 & visit == "visit_3",
+                NA_real_,
+                outcome
+            )
+        ) %>%
         select(-is_miss)
-
 
     dat_ice <- dat %>%
         group_by(id) %>%
@@ -58,7 +150,6 @@ test_that("Basic Usage - Approx Bayes", {
         ungroup() %>%
         select(id, visit) %>%
         mutate(strategy = "JR")
-
 
     vars <- set_vars(
         outcome = "outcome",
@@ -103,26 +194,21 @@ test_that("Basic Usage - Approx Bayes", {
 })
 
 
-
-
-
-
-
-
-
-
-
 test_that("Basic Usage - Bayesian", {
-
     skip_if_not(is_full_test())
 
     set.seed(5123)
 
     dat <- get_sim_data(bign, sigma, trt = 8) %>%
         mutate(is_miss = rbinom(n(), 1, 0.5)) %>%
-        mutate(outcome = if_else(is_miss == 1 & visit == "visit_3", NA_real_, outcome)) %>%
+        mutate(
+            outcome = if_else(
+                is_miss == 1 & visit == "visit_3",
+                NA_real_,
+                outcome
+            )
+        ) %>%
         select(-is_miss)
-
 
     dat_ice <- dat %>%
         group_by(id) %>%
@@ -132,7 +218,6 @@ test_that("Basic Usage - Bayesian", {
         ungroup() %>%
         select(id, visit) %>%
         mutate(strategy = "MAR")
-
 
     vars <- set_vars(
         outcome = "outcome",
@@ -201,20 +286,84 @@ test_that("Basic Usage - Bayesian", {
 })
 
 
+test_that("Advanced Usage - Bayesian with AR1 covariance model", {
+    skip_if_not(is_full_test())
 
+    set.seed(5123)
+    advanced_bayes_test("ar1")
+})
 
+test_that("Advanced Usage - Bayesian with heterogeneous AR1 covariance model", {
+    skip_if_not(is_full_test())
+
+    set.seed(5521)
+    advanced_bayes_test("ar1h")
+})
+
+test_that("Advanced Usage - Bayesian with unstructured covariance model and LKJ prior", {
+    skip_if_not(is_full_test())
+
+    set.seed(5346)
+    advanced_bayes_test(cov_struct = "us", prior_cov = "lkj")
+})
+
+test_that("Advanced Usage - Bayesian with compound symmetry covariance model", {
+    skip_if_not(is_full_test())
+
+    set.seed(8579)
+    advanced_bayes_test("cs")
+})
+
+test_that("Advanced Usage - Bayesian with heterogeneous compound symmetry covariance model", {
+    skip_if_not(is_full_test())
+
+    set.seed(8579)
+    advanced_bayes_test("csh")
+})
+
+test_that("Advanced Usage - Bayesian with antedependence covariance model", {
+    skip_if_not(is_full_test())
+
+    set.seed(3546)
+    advanced_bayes_test("ad")
+})
+
+test_that("Advanced Usage - Bayesian with heterogeneous antedependence covariance model", {
+    skip_if_not(is_full_test())
+
+    set.seed(2341)
+    advanced_bayes_test("adh")
+})
+
+test_that("Advanced Usage - Bayesian with Toeplitz covariance model", {
+    skip_if_not(is_full_test())
+
+    set.seed(3046)
+    advanced_bayes_test("toep")
+})
+
+test_that("Advanced Usage - Bayesian with heterogeneous Toeplitz covariance model", {
+    skip_if_not(is_full_test())
+
+    set.seed(4341)
+    advanced_bayes_test("toeph")
+})
 
 test_that("Basic Usage - Condmean", {
-
     skip_if_not(is_full_test())
 
     set.seed(4642)
 
     dat <- get_sim_data(bign, sigma, trt = 8) %>%
         mutate(is_miss = rbinom(n(), 1, 0.5)) %>%
-        mutate(outcome = if_else(is_miss == 1 & visit == "visit_3", NA_real_, outcome)) %>%
+        mutate(
+            outcome = if_else(
+                is_miss == 1 & visit == "visit_3",
+                NA_real_,
+                outcome
+            )
+        ) %>%
         select(-is_miss)
-
 
     dat_ice <- dat %>%
         group_by(id) %>%
@@ -224,7 +373,6 @@ test_that("Basic Usage - Condmean", {
         ungroup() %>%
         select(id, visit) %>%
         mutate(strategy = "JR")
-
 
     vars <- set_vars(
         outcome = "outcome",
@@ -289,23 +437,21 @@ test_that("Basic Usage - Condmean", {
 })
 
 
-
-
-
-
-
-
 test_that("Custom Strategies and Custom analysis functions", {
-
     skip_if_not(is_full_test())
 
     set.seed(8368)
 
     dat <- get_sim_data(bign, sigma, trt = 8) %>%
         mutate(is_miss = rbinom(n(), 1, 0.5)) %>%
-        mutate(outcome = if_else(is_miss == 1 & visit == "visit_3", NA_real_, outcome)) %>%
+        mutate(
+            outcome = if_else(
+                is_miss == 1 & visit == "visit_3",
+                NA_real_,
+                outcome
+            )
+        ) %>%
         select(-is_miss)
-
 
     dat_ice <- dat %>%
         group_by(id) %>%
@@ -316,7 +462,6 @@ test_that("Custom Strategies and Custom analysis functions", {
         select(id, visit) %>%
         mutate(strategy = "XX")
 
-
     vars <- set_vars(
         outcome = "outcome",
         group = "group",
@@ -326,7 +471,6 @@ test_that("Custom Strategies and Custom analysis functions", {
         covariates = c("age", "sex", "visit * group")
     )
 
-
     drawobj <- draws(
         data = dat,
         data_ice = dat_ice,
@@ -335,7 +479,6 @@ test_that("Custom Strategies and Custom analysis functions", {
         quiet = TRUE,
         ncores = NCORES
     )
-
 
     imputeobj <- impute(
         draws = drawobj,
@@ -367,8 +510,6 @@ test_that("Custom Strategies and Custom analysis functions", {
         4 + c(-0.3, 0.3)
     )
 
-
-
     dat_delta <- delta_template(imputeobj) %>%
         as_tibble() %>%
         mutate(delta = if_else(group == "B" & is_missing, 20, 0))
@@ -383,12 +524,9 @@ test_that("Custom Strategies and Custom analysis functions", {
 
     expect_pool_est(poolobj_delta, 14, "treatment_effect")
 
-
-
     dat_delta <- delta_template(imputeobj) %>%
         as_tibble() %>%
         mutate(delta = if_else(group == "B" & is_missing, 40, 0))
-
 
     anaobj_delta <- analyse(
         imputeobj,
@@ -399,9 +537,6 @@ test_that("Custom Strategies and Custom analysis functions", {
     poolobj_delta <- pool(anaobj_delta)
 
     expect_pool_est(poolobj_delta, 24, "treatment_effect")
-
-
-
 
     ddat <- tibble(
         id = "1",
@@ -425,9 +560,7 @@ test_that("Custom Strategies and Custom analysis functions", {
 })
 
 
-
 test_that("Sorting doesn't change results", {
-
     skip_if_not(is_full_test())
 
     set.seed(4642)
@@ -483,7 +616,6 @@ test_that("Sorting doesn't change results", {
     anaobj <- analyse(imputeobj, fun = rbmi::ancova, vars = vars2)
     poolobj <- pool(results = anaobj)
 
-
     set.seed(984)
     drawobj2 <- draws(
         data = dat2,
@@ -510,13 +642,7 @@ test_that("Sorting doesn't change results", {
 })
 
 
-
-
-
-
-
 test_that("Multiple imputation references / groups work as expected (end to end checks)", {
-
     skip_if_not(is_full_test())
 
     extract_ci <- function(x, ref) {
@@ -557,7 +683,13 @@ test_that("Multiple imputation references / groups work as expected (end to end 
             mutate(group2 = if_else(group == "A", "A", "D")) %>%
             mutate(id = paste0(id, "C"))
     ) %>%
-        mutate(outcome = if_else(rbinom(n(), 1, 0.5) == 1 & visit == "visit_3", NA_real_, outcome)) %>%
+        mutate(
+            outcome = if_else(
+                rbinom(n(), 1, 0.5) == 1 & visit == "visit_3",
+                NA_real_,
+                outcome
+            )
+        ) %>%
         mutate(id = factor(id)) %>%
         mutate(group2 = factor(group2, levels = c("A", "B", "C", "D")))
 
@@ -593,7 +725,6 @@ test_that("Multiple imputation references / groups work as expected (end to end 
         quiet = TRUE
     )
 
-
     t1 <- (s1 + 0) / 2
     t2 <- (s2 + 0) / 2
     t3 <- (s3 + 0) / 2
@@ -617,7 +748,6 @@ test_that("Multiple imputation references / groups work as expected (end to end 
         mean(c(t1, t2, t3)),
         extract_ci(x, c("A" = "A", "B" = "C", "C" = "C", "D" = "C"))
     )
-
 
     x <- draws(
         data = dat,
@@ -671,12 +801,10 @@ test_that("Multiple imputation references / groups work as expected (end to end 
 
 
 test_that("rbmi works for one arm trials", {
-
     skip_if_not(is_full_test())
 
     # ancova cannot be applied for 1 arm trial. Use a custom analysis function
     myanalysis <- function(data, ...) {
-
         data_anal <- data[data[[vars$visit]] == "visit_3", ][[vars$outcome]]
         res <- list(
             mean = list(
@@ -704,15 +832,24 @@ test_that("rbmi works for one arm trials", {
     vars_wrong2$covariates <- c("age", "sex", "group", "visit")
 
     set.seed(169)
-    dat_full <- simulate_test_data(n = 100, sd = 0.1 * c(3, 5, 7)) %>% as_tibble()
+    dat_full <- simulate_test_data(n = 100, sd = 0.1 * c(3, 5, 7)) %>%
+        as_tibble()
 
     ## Introduce missingness
-    missing_index_vis2 <- rbinom(nrow(dat_full), 1, 0.3) == 1 & dat_full$visit == "visit_2"
-    missing_index_vis3 <- rbinom(nrow(dat_full), 1, 0.4) == 1 & dat_full$visit == "visit_3"
+    missing_index_vis2 <- rbinom(nrow(dat_full), 1, 0.3) == 1 &
+        dat_full$visit == "visit_2"
+    missing_index_vis3 <- rbinom(nrow(dat_full), 1, 0.4) == 1 &
+        dat_full$visit == "visit_3"
 
     # select subjects belonging to one group only
     dat <- dat_full %>%
-        mutate(outcome = if_else(missing_index_vis2 | missing_index_vis3, NA_real_, outcome)) %>%
+        mutate(
+            outcome = if_else(
+                missing_index_vis2 | missing_index_vis3,
+                NA_real_,
+                outcome
+            )
+        ) %>%
         filter(group == "A") %>%
         mutate(group_wrong = group) %>%
         mutate(id = factor(id, levels = unique(id))) %>%
@@ -731,8 +868,15 @@ test_that("rbmi works for one arm trials", {
         select(id, visit) %>%
         mutate(strategy = "MAR")
 
-    runtest <- function(dat, dat_ice, vars, vars_wrong, vars_wrong2, vars_wrong3, method) {
-
+    runtest <- function(
+        dat,
+        dat_ice,
+        vars,
+        vars_wrong,
+        vars_wrong2,
+        vars_wrong3,
+        method
+    ) {
         draw_obj <- draws(
             data = dat,
             data_ice = dat_ice,
@@ -821,7 +965,6 @@ test_that("rbmi works for one arm trials", {
 
 
 test_that("Three arms trial runs smoothly and gives expected results", {
-
     copy_group <- function(dat, name_group) {
         datC <- dat[dat$group == name_group, ]
         datC$group <- "C"
@@ -831,7 +974,6 @@ test_that("Three arms trial runs smoothly and gives expected results", {
     }
 
     myanfun <- function(data, ...) {
-
         # apply ancova between A and B
         data_temp <- data[data$group %in% c("A", "B"), ]
         data_temp$group <- factor(data_temp$group, levels = c("A", "B"))
@@ -848,7 +990,6 @@ test_that("Three arms trial runs smoothly and gives expected results", {
         )
 
         return(ret_obj)
-
     }
 
     set.seed(101)
@@ -859,7 +1000,13 @@ test_that("Three arms trial runs smoothly and gives expected results", {
     dat <- get_sim_data(bign, sigma, trt = 8)
     dat <- dat %>%
         mutate(is_miss = rbinom(n(), 1, 0.5)) %>%
-        mutate(outcome = if_else(is_miss == 1 & visit == "visit_3", NA_real_, outcome)) %>%
+        mutate(
+            outcome = if_else(
+                is_miss == 1 & visit == "visit_3",
+                NA_real_,
+                outcome
+            )
+        ) %>%
         select(-is_miss)
     dat <- copy_group(dat, name_group = "B")
     datB <- dat$outcome[dat$group == "B" & !is.na(dat$outcome)]
@@ -875,7 +1022,6 @@ test_that("Three arms trial runs smoothly and gives expected results", {
         select(id, visit) %>%
         mutate(strategy = "JR")
 
-
     vars <- set_vars(
         outcome = "outcome",
         group = "group",
@@ -890,7 +1036,11 @@ test_that("Three arms trial runs smoothly and gives expected results", {
         data_ice = dat_ice,
         vars = vars,
         quiet = TRUE,
-        method = method_condmean(n_samples = nsamp, type = "bootstrap", same_cov = TRUE)
+        method = method_condmean(
+            n_samples = nsamp,
+            type = "bootstrap",
+            same_cov = TRUE
+        )
     )
 
     imputeobj <- impute(
@@ -911,17 +1061,23 @@ test_that("Three arms trial runs smoothly and gives expected results", {
 
     # check that groups B and C have same imputed values, same estimated and pooled treatment effect
     imp_dat <- extract_imputed_dfs(imputeobj)[[1]]
-    expect_equal(imp_dat$outcome[imp_dat$group == "B"], imp_dat$outcome[imp_dat$group == "C"])
+    expect_equal(
+        imp_dat$outcome[imp_dat$group == "B"],
+        imp_dat$outcome[imp_dat$group == "C"]
+    )
     expect_equal(anaobj$results[[1]]$trtB, anaobj$results[[1]]$trtC)
     expect_equal(pooled$pars$trtB, pooled$pars$trtC)
-
 
     drawobj <- draws(
         data = dat,
         data_ice = dat_ice,
         vars = vars,
         quiet = TRUE,
-        method = method_condmean(n_samples = nsamp, type = "bootstrap", same_cov = FALSE)
+        method = method_condmean(
+            n_samples = nsamp,
+            type = "bootstrap",
+            same_cov = FALSE
+        )
     )
 
     imputeobj <- impute(
@@ -939,7 +1095,10 @@ test_that("Three arms trial runs smoothly and gives expected results", {
 
     # check that groups B and C have same imputed values, same estimated and pooled treatment effect
     imp_dat <- extract_imputed_dfs(imputeobj)[[1]]
-    expect_equal(imp_dat$outcome[imp_dat$group == "B"], imp_dat$outcome[imp_dat$group == "C"])
+    expect_equal(
+        imp_dat$outcome[imp_dat$group == "B"],
+        imp_dat$outcome[imp_dat$group == "C"]
+    )
     expect_equal(anaobj$results[[1]]$trtB, anaobj$results[[1]]$trtC)
     expect_equal(pooled$pars$trtB, pooled$pars$trtC)
 })

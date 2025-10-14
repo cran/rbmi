@@ -1,6 +1,3 @@
-
-
-
 #' Construct random effects formula
 #'
 #' Constructs a character representation of the random effects formula
@@ -23,7 +20,17 @@
 #' `"ad"`, `"adh"`, `"ar1"`, `"ar1h"`, `"cs"`, `"csh"`, `"toep"`, or `"toeph"`)
 #' @param cov_by_group Boolean - Whenever or not to use separate covariances per each group level
 random_effects_expr <- function(
-    cov_struct = c("us", "ad", "adh", "ar1", "ar1h", "cs", "csh", "toep", "toeph"),
+    cov_struct = c(
+        "us",
+        "ad",
+        "adh",
+        "ar1",
+        "ar1h",
+        "cs",
+        "csh",
+        "toep",
+        "toeph"
+    ),
     cov_by_group = FALSE
 ) {
     match.arg(cov_struct)
@@ -47,12 +54,10 @@ random_effects_expr <- function(
 #' - If provided will also insert the group variable into the `data.frame` named as `group`
 #'
 #' @inheritParams fit_mmrm
-as_mmrm_df <- function(designmat,
-                       outcome,
-                       visit,
-                       subjid,
-                       group = NULL) {
-    if (length(group) == 0) group <- NULL
+as_mmrm_df <- function(designmat, outcome, visit, subjid, group = NULL) {
+    if (length(group) == 0) {
+        group <- NULL
+    }
 
     dmat <- as.data.frame(designmat)
     colnames(dmat) <- paste0("V", seq_len(ncol(dmat)))
@@ -97,8 +102,12 @@ as_mmrm_formula <- function(mmrm_df, cov_struct) {
     g_names <- grep("^group$", dfnames, value = TRUE)
     v_names <- grep("^V", dfnames, value = TRUE)
 
-    assert_that(all(dfnames %in% c("outcome", "visit", "subjid", g_names, v_names)))
-    assert_that(all(c("outcome", "visit", "subjid", g_names, v_names) %in% dfnames))
+    assert_that(all(
+        dfnames %in% c("outcome", "visit", "subjid", g_names, v_names)
+    ))
+    assert_that(all(
+        c("outcome", "visit", "subjid", g_names, v_names) %in% dfnames
+    ))
 
     # random effects for covariance structure
     expr_randeff <- random_effects_expr(
@@ -108,17 +117,44 @@ as_mmrm_formula <- function(mmrm_df, cov_struct) {
 
     # paste and create formula object
     formula <- as.formula(
-        sprintf("outcome ~ %s - 1", paste0(c(v_names, expr_randeff), collapse = " + "))
+        sprintf(
+            "outcome ~ %s - 1",
+            paste0(c(v_names, expr_randeff), collapse = " + ")
+        )
     )
 
     return(formula)
 }
 
+#' Convert Transformed Correlation to Correlation
+#'
+#' @param theta The transformed correlation parameter.
+#' @return The correlation value.
+#'
+#' @keywords internal
+theta_to_cor <- function(theta) {
+    theta / sqrt(1 + theta^2)
+}
+
+#' Convert Transformed Compound Symmetry Correlation to Correlation
+#'
+#' @param theta The transformed compound symmetry correlation parameter.
+#' @return The correlation value.
+#'
+#' @importFrom stats plogis
+#' @keywords internal
+theta_to_cs_cor <- function(theta, n_visits) {
+    a <- 1 / (n_visits - 1)
+    plogis(theta) * (1 + a) - a
+}
 
 #' Extract parameters from a MMRM model
 #'
 #' Extracts the beta and sigma coefficients from an MMRM model created
 #' by [mmrm::mmrm()].
+#'
+#' For structured covariance models, additional parameter estimates will be returned, based on the type
+#' of the covariance model.
 #'
 #' @importFrom mmrm VarCorr
 #' @param fit an object created by [mmrm::mmrm()]
@@ -128,23 +164,81 @@ extract_params <- function(fit) {
     names(beta) <- NULL
 
     sigma <- VarCorr(fit)
-    if (!is.list(sigma)) {
+    same_cov <- !is.list(sigma)
+    if (same_cov) {
         sigma <- list(sigma)
     }
     sigma <- lapply(sigma, function(mat) {
         colnames(mat) <- NULL
         rownames(mat) <- NULL
-        return(mat)
+        mat
     })
-
     params <- list(
         beta = beta,
         sigma = sigma
     )
-    return(params)
+
+    cov_type <- mmrm::component(fit, "cov_type")
+    theta_est <- mmrm::component(fit, "theta_est")
+    n_visits <- mmrm::component(fit, "n_timepoints")
+
+    theta_est <- if (same_cov) {
+        list(theta_est)
+    } else {
+        groups <- names(sigma)
+        n_par_per_group <- length(theta_est) / length(groups)
+        split(theta_est, rep(groups, each = n_par_per_group))
+    }
+
+    if (cov_type == "ar1") {
+        lapply(theta_est, function(theta) {
+            assert_that(identical(length(theta), 2L))
+        })
+        params$sd <- lapply(theta_est, function(theta) exp(theta[1]))
+        params$rho <- lapply(theta_est, function(theta) theta_to_cor(theta[2]))
+    } else if (cov_type == "ar1h") {
+        lapply(theta_est, function(theta) {
+            assert_that(identical(length(theta), n_visits + 1L))
+        })
+        params$sds <- lapply(theta_est, function(theta) exp(theta[1:n_visits]))
+        params$rho <- lapply(theta_est, function(theta) {
+            theta_to_cor(theta[n_visits + 1])
+        })
+    } else if (cov_type == "cs") {
+        lapply(theta_est, function(theta) {
+            assert_that(identical(length(theta), 2L))
+        })
+        params$sd <- lapply(theta_est, function(theta) exp(theta[1]))
+        params$rho <- lapply(theta_est, function(theta) {
+            theta_to_cs_cor(theta[2], n_visits)
+        })
+    } else if (cov_type == "csh") {
+        lapply(theta_est, function(theta) {
+            assert_that(identical(length(theta), n_visits + 1L))
+        })
+        params$sds <- lapply(theta_est, function(theta) exp(theta[1:n_visits]))
+        params$rho <- lapply(theta_est, function(theta) {
+            theta_to_cs_cor(theta[n_visits + 1], n_visits)
+        })
+    } else if (cov_type %in% c("ad", "toep")) {
+        lapply(theta_est, function(theta) {
+            assert_that(identical(length(theta), n_visits))
+        })
+        params$sd <- lapply(theta_est, function(theta) exp(theta[1]))
+        params$rhos <- lapply(theta_est, function(theta) {
+            theta_to_cor(theta[-1])
+        })
+    } else if (cov_type %in% c("adh", "toeph")) {
+        lapply(theta_est, function(theta) {
+            assert_that(length(theta) == 2 * n_visits - 1)
+        })
+        params$sds <- lapply(theta_est, function(theta) exp(theta[1:n_visits]))
+        params$rhos <- lapply(theta_est, function(theta) {
+            theta_to_cor(theta[-(1:n_visits)])
+        })
+    }
+    params
 }
-
-
 
 
 #' Fit a MMRM model
@@ -164,6 +258,7 @@ extract_params <- function(fit) {
 #' that belong to the same subject.
 #' @param visit a character / factor vector. Indicates which visit the outcome value occurred on.
 #' @param group a character / factor vector. Indicates which treatment group the patient belongs to.
+#'   Will internally be converted to a factor if it is a character vector.
 #' @param cov_struct a character value. Specifies which covariance structure to use. Must be one of `"us"` (default),
 #' `"ad"`, `"adh"`, `"ar1"`, `"ar1h"`, `"cs"`, `"csh"`, `"toep"`, or `"toeph"`)
 #' @param REML logical. Specifies whether restricted maximum likelihood should be used
@@ -178,10 +273,24 @@ fit_mmrm <- function(
     subjid,
     visit,
     group,
-    cov_struct = c("us", "ad", "adh", "ar1", "ar1h", "cs", "csh", "toep", "toeph"),
+    cov_struct = c(
+        "us",
+        "ad",
+        "adh",
+        "ar1",
+        "ar1h",
+        "cs",
+        "csh",
+        "toep",
+        "toeph"
+    ),
     REML = TRUE,
     same_cov = TRUE
 ) {
+    if (!is.factor(group)) {
+        assert_that(is.character(group))
+        group <- factor(group)
+    }
     dat_mmrm <- as_mmrm_df(
         designmat = designmat,
         outcome = outcome,
@@ -206,37 +315,37 @@ fit_mmrm <- function(
         return(fit)
     }
 
-    # extract regression coefficients and covariance matrices
+    # Extract regression coefficients and covariance parameters.
     params <- extract_params(fit)
+    cov_param_names <- setdiff(names(params), "beta")
     params$failed <- fit$failed
 
-    # adjust covariance matrix
+    # Replicate covariance parameter estimates across groups if
+    # same covariance is used across groups.
     if (same_cov) {
-        assert_that(length(params$sigma) == 1)
-        params$sigma <- replicate(
-            length(levels(group)),
-            params$sigma[[1]],
-            simplify = FALSE
-        )
+        for (cov_param in cov_param_names) {
+            assert_that(length(params[[cov_param]]) == 1)
+            params[[cov_param]] <- replicate(
+                length(levels(group)),
+                params[[cov_param]][[1]],
+                simplify = FALSE
+            )
+            names(params[[cov_param]]) <- levels(group)
+        }
     }
-    names(params$sigma) <- levels(group)
 
-    return(params)
+    structure(
+        params,
+        cov_param_names = cov_param_names
+    )
 }
-
-
-
 
 #' Evaluate a call to mmrm
 #'
 #' This is a utility function that attempts to evaluate a call to mmrm
-#' managing any warnings or errors that are thrown. In particular
-#' this function attempts to catch any warnings or errors and instead
-#' of surfacing them it will simply add an additional element `failed`
-#' with a value of TRUE. This allows for multiple calls to be made
-#' without the program exiting.
+#' managing any warnings or errors that are thrown.
 #'
-#' This function was originally developed for use with glmmTMB which needed
+#' This function was originally developed for use with `glmmTMB` which needed
 #' more hand-holding and dropping of false-positive warnings. It is not
 #' as important now but is kept around encase we need to catch
 #' false-positive warnings again in the future.
@@ -251,23 +360,13 @@ fit_mmrm <- function(
 #' @seealso [record()]
 #'
 eval_mmrm <- function(expr) {
-
-    default <- list(failed = TRUE)
-
     fit_record <- record(expr)
 
-    if (length(fit_record$warnings) > 0 || length(fit_record$errors) > 0) {
-        return(default)
+    if (!is(fit_record$results, "mmrm")) {
+        return(list(failed = TRUE))
     }
 
-    converged <- attributes(fit_record$results)$converged
-    if (is.null(converged)) {
-        return(default)
-    }
-    if (!converged) {
-        return(default)
-    }
-
-    fit_record$results$failed <- FALSE
-    return(fit_record$results)
+    has_converged <- attributes(fit_record$results)$converged
+    fit_record$results$failed <- ifelse(has_converged, FALSE, TRUE)
+    fit_record$results
 }

@@ -1,9 +1,27 @@
+# rbmi 1.5.1
+
+## Bug Fixes
+
+* Modify caching in tests to speed up testing on CRAN.
+
+# rbmi 1.5.0
+
+## New Features
+
+* All covariance structures are now also supported for Bayesian multiple imputation: `method_bayes()` gained additional `covariance` and `prior_cov` arguments to allow users to specify the covariance structure and prior for the Bayesian imputation model. Please see the updated statistical specifications vignette for details. (#501, #518)
+* New function `mcse()` to calculate the Monte Carlo standard error for pooled estimates from (approximate) Bayesian imputation. (#493)
+
+## Bug Fixes
+
+* Fixed cluster used in parallel test and make sure tests clean up Stan files properly. (#523)
+* Small updates and fixes to documentation. (#504, #506, #498)
 
 # rbmi 1.4.1
 
+## Bug Fixes
+
 * Fixed Stan related bug that caused unit tests to fail on machines compiling with the C23 standard (#481)
 * Fixed bug in unit test that caused false-positive reproducibility errors (#483)
-
 
 # rbmi 1.4.0
 
@@ -19,7 +37,6 @@
 
 * Fixed bug where `lsmeans(.weights = "proportional_em")` would error if there was only a single categorical variable in the dataset. (#412)
 * Removed native pipes `|>` and lambda functions `\(x)` from code base to ensure package is backwards compatible with older versions of R. (#474)
-
 
 # rbmi 1.3.1
 
@@ -52,7 +69,6 @@
 * Stopped warning messages being accidentally supressed when changing the ICE type in `impute()` (#408)
 * Fixed equations not rendering properly in the `pkgdown` website (#433) 
 
-
 # rbmi 1.2.6
 
 * Updated unit tests to fix false-positive error on CRAN's testing servers
@@ -78,7 +94,6 @@
 * Fixed a bug where visit factor levels were re-constructed incorrectly in `delta_template()`
 * Fixed a bug where the wrong visit was displayed in the error message for when a specific visit doesn't have any data in `draws()`
 * Fixed a bug where the wrong input parameter was displayed in an error message in `simulate_data()`
-
   
 # rbmi 1.1.1 & 1.1.3
  
@@ -88,4 +103,3 @@
 # rbmi 1.1.0
   
 * Initial public release
-  
