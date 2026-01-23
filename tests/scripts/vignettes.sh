@@ -1,14 +1,14 @@
 
-export RBMI_CACHE_DIR="$(pwd)/local"
-export R_TEST_FULL=FALSE
-export R_TEST_LOCAL=TRUE
+export RBMI_CACHE_DIR="${RBMI_CACHE_DIR:-$(pwd)/local}"
+export RBMI_TEST_EXTENDED=FALSE
+export RBMI_TEST_CORE=TRUE
 
 echo "
 Debug:
 -------
-PWD          = $(pwd)
-R_TEST_FULL  = ${R_TEST_FULL}
-R_TEST_LOCAL = ${R_TEST_LOCAL}
+PWD                 = $(pwd)
+RBMI_TEST_CORE      = ${RBMI_TEST_CORE}
+RBMI_TEST_EXTENDED  = ${RBMI_TEST_EXTENDED}
 
 "
 

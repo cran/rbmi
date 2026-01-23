@@ -130,7 +130,7 @@ test_that("condmean - bootstrap", {
 
 
 test_that("condmean - jackknife", {
-    skip_if_not(is_full_test())
+    skip_if_not(is_extended_test())
 
     set.seed(40123)
     N <- 70
@@ -157,6 +157,7 @@ test_that("condmean - jackknife", {
 
 
 test_that("bayes", {
+    skip_if_not(is_core_test())
     set.seed(40123)
     d <- get_data(140)
     meth <- method_bayes(
