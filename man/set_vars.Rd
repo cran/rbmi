@@ -23,13 +23,19 @@ set_vars(
 
 \item{group}{The name of the "Group" variable. A length 1 character vector.}
 
-\item{covariates}{The name of any covariates to be used in the context of modeling.
+\item{covariates}{The name of any covariates to be used in the context of modelling.
 See details.}
 
 \item{strata}{The name of the any stratification variable to be used in the context of bootstrap
 sampling. See details.}
 
 \item{strategy}{The name of the "strategy" variable. A length 1 character vector.}
+}
+\value{
+A \code{vars} object; a named list of class \code{ivars} recording the names of the key
+variables (\code{subjid}, \code{visit}, \code{outcome}, \code{group}, \code{covariates}, \code{strata} and
+\code{strategy}) used throughout \code{rbmi} by functions such as \code{\link[=draws]{draws()}}, \code{\link[=ancova]{ancova()}}
+and \code{\link[=analyse]{analyse()}}.
 }
 \description{
 This function is used to define the names of key variables within the \code{data.frame}'s

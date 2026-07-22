@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
 
 export RBMI_CACHE_DIR="${RBMI_CACHE_DIR:-$(pwd)/local}"
 export RBMI_TEST_EXTENDED=FALSE
@@ -12,4 +14,4 @@ RBMI_TEST_EXTENDED  = ${RBMI_TEST_EXTENDED}
 
 "
 
-Rscript -e "devtools::test()"
+Rscript -e "devtools::test(stop_on_failure=TRUE)"

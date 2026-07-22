@@ -1,3 +1,39 @@
+# rbmi 1.6.1
+
+## New Features
+* rbmi now uses the `lifecycle` package 
+* Added en-GB spell-check and a corresponding test to the package
+
+## Documentation
+* Documented the return value (`@return`) of all exported functions and marked
+  internal helpers with `@keywords internal` (#567).
+* Added executable `@examples` to the exported user-facing functions that were
+  missing them, and marked the internal-only `has_class()`, `validate()` and
+  `longDataConstructor` with `@keywords internal` (#570).
+
+## Bug Fixes
+* The vignette on retrieved dropout methods is now correctly embedded.
+* Fixed numerous spelling errors and standardised nomenclature for missing not
+  at random to `MNAR` (rather than a mix of `NMAR` and `MNAR`)
+* Deprecated `nmar.rm` argument of `longdata$get_data` in favour of `mnar.rm` 
+  for nomenclature consistency.
+* Fixed a misleading error message in `imputation_list_single()` where a failure of
+  the imputation-count-divisible-by-`D` check incorrectly reported that "multiple
+  `ids` were detected" (#574)
+* Improved CI/CD scripts to reliably fail GitHub CI/CD in case of failing tests.
+* Fixed error message for `mu$visit` in `simulate_test_data()` to refer to 
+  `visit` instead of `trt` (#578)
+* Fixed a bug where each non-ignorable Stan warning from the Bayesian sampler
+  was reported multiple times instead of once. (#572)
+* Fixed the error message in `apply_delta()` to correctly refer to `data`
+  instead of `dat` (#576)
+* Fixed the broken GitHub badge in `README.md` (#548)
+
+
+## Miscellaneous
+* Replaced deprecated `structure()` special name `.Dim` with `dim` in unit tests
+  to resolve an `R CMD check` NOTE (#581)
+* Updated Marcel Wolbers' e-mail address (#583)
 
 # rbmi 1.6.0
 
@@ -73,20 +109,20 @@
     * Renamed `lsmeans(..., weights = "proportional")` to `lsmeans(..., weights = "counterfactual")`to more accurately reflect the weights used in the calculation.
     * Added `lsmeans(..., weights = "proportional_em")` which provides consistent results with `emmeans(..., weights = "proportional")`
     * `lsmeans(..., weights = "proportional")` has been left in the package for backwards compatibility and is an alias for `lsmeans(..., weights = "counterfactual")` but now gives
-    a message prompting users to use either "proptional_em" or "counterfactual" instead.
+    a message prompting users to use either "proportional_em" or "counterfactual" instead.
 * Added support for parallel processing in the `analyse()` function (#370)
-* Added documentation clarifying potential false-positive warnings from rstan (#288)
+* Added documentation clarifying potential false-positive warnings from `rstan` (#288)
 * Added support for all covariance structures supported by the `mmrm` package (#437)
 * Updated `rbmi` citation detail (#423 #425)
 
 ## Miscellaneous Bug Fixes
 
-* Stopped warning messages being accidentally supressed when changing the ICE type in `impute()` (#408)
+* Stopped warning messages being accidentally suppressed when changing the ICE type in `impute()` (#408)
 * Fixed equations not rendering properly in the `pkgdown` website (#433) 
 
 # rbmi 1.2.6
 
-* Updated unit tests to fix false-positive error on CRAN's testing servers
+* Updated unit tests to fix false-positive error on CRAN testing servers
 
 # rbmi 1.2.5
 
@@ -105,7 +141,7 @@
 
 # rbmi 1.1.4
 
-* Updated urls for references in vignettes
+* Updated URLs for references in vignettes
 * Fixed a bug where visit factor levels were re-constructed incorrectly in `delta_template()`
 * Fixed a bug where the wrong visit was displayed in the error message for when a specific visit doesn't have any data in `draws()`
 * Fixed a bug where the wrong input parameter was displayed in an error message in `simulate_data()`

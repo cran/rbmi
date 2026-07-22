@@ -351,8 +351,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><code>analyse()</code> - analyses each of the multiple imputed datasets</li>
 <li><code>pool()</code> - combines the analysis results across imputed datasets into a single statistic</li>
 </ul>
-<p>This example in this vignette makes use of Bayesian multiuple imputation; this functionality
-requires the installation of the suggested package <a href="https://CRAN.R-project.org/package=rstan">rstan</a>.</p>
+<p>This example in this vignette makes use of Bayesian multiple imputation; this functionality
+requires the installation of the suggested package <a href="https://CRAN.R-project.org/package=rstan"><code>rstan</code></a>.</p>
 <pre><code>install.packages(&quot;rstan&quot;)</code></pre>
 </div>
 <div id="the-data" class="section level1" number="2">
@@ -395,7 +395,7 @@ The three main inputs to the <code>draws()</code> function are:</p>
 </ul>
 <p>For the antidepressant trial data, the dataset <code>data_ice</code> is not provided. However, it can be derived because, in this dataset,
 the subject’s first visit affected by the ICE “study drug discontinuation” corresponds to the first terminal missing observation.
-We first derive the dateset <code>data_ice</code> and then create 150 Bayesian posterior draws of the imputation model parameters.</p>
+We first derive the dataset <code>data_ice</code> and then create 150 Bayesian posterior draws of the imputation model parameters.</p>
 <p>For this example, we assume that the imputation strategy after the ICE is Jump To Reference (JR) for all subjects
 and that 150 multiple imputed datasets using Bayesian posterior draws from the imputation model are to be created.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># create data_ice and set the imputation strategy to JR for</span></span>
@@ -604,8 +604,8 @@ effect estimate and corresponding least square means for each group per visit.</
 <p>Note that, similar to <code>draws()</code>, the <code>ancova()</code> function uses the <code>set_vars()</code>
 function which determines the names of the key variables within the data and the covariates
 (in addition to the treatment group) for which the analysis model will be adjusted.</p>
-<p>Please also note that the names of the analysis estimates contain “ref” and “alt” to refer to the two treatment arms. In particular “ref” refers to the first factor level of <code>vars$group</code> which does not necessarily
-coincide with the control arm. In this example, since <code>levels(dat[[vars$group]]) = c(&quot;DRUG&quot;, PLACEBO</code>), the results associated with “ref” correspond to the intervention arm, while those associated with “alt” correspond to the control arm.</p>
+<p>Please also note that the names of the analysis estimates contain <code>ref</code> and <code>alt</code> to refer to the two treatment arms. In particular <code>ref</code> refers to the first factor level of <code>vars$group</code> which does not necessarily
+coincide with the control arm. In this example, since <code>levels(dat[[vars$group]]) = c(&quot;DRUG&quot;, PLACEBO</code>), the results associated with <code>ref</code> correspond to the intervention arm, while those associated with <code>alt</code> correspond to the control arm.</p>
 <p>Additionally, we can use the <code>delta</code> argument of <code>analyse()</code> to perform a delta adjustments of the imputed datasets prior to the analysis.
 In brief, this is implemented by specifying a data.frame that contains the amount
 of adjustment to be added to each longitudinal outcome for each subject and visit, i.e. 
@@ -704,34 +704,34 @@ in the original call to <code>draws()</code>:</p>
 <span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a><span class="co">#&gt;      trt_4    -0.092  0.683  -1.439  1.256   0.893  </span></span>
 <span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a><span class="co">#&gt;    lsm_ref_4  -1.616  0.486  -2.576  -0.656  0.001  </span></span>
 <span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a><span class="co">#&gt;    lsm_alt_4  -1.708  0.475  -2.645  -0.77   &lt;0.001 </span></span>
-<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a><span class="co">#&gt;      trt_5    1.345   0.922  -0.476  3.166   0.147  </span></span>
-<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a><span class="co">#&gt;    lsm_ref_5  -4.158  0.657  -5.457  -2.86   &lt;0.001 </span></span>
-<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a><span class="co">#&gt;    lsm_alt_5  -2.813  0.645  -4.087  -1.54   &lt;0.001 </span></span>
-<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a><span class="co">#&gt;      trt_6    1.971   0.997  0.002   3.941    0.05  </span></span>
-<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a><span class="co">#&gt;    lsm_ref_6  -6.105  0.717  -7.522  -4.688  &lt;0.001 </span></span>
-<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a><span class="co">#&gt;    lsm_alt_6  -4.133  0.705  -5.526  -2.741  &lt;0.001 </span></span>
-<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a><span class="co">#&gt;      trt_7    2.205   1.118  -0.005  4.414    0.05  </span></span>
-<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a><span class="co">#&gt;    lsm_ref_7  -7.008  0.83   -8.65   -5.366  &lt;0.001 </span></span>
-<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a><span class="co">#&gt;    lsm_alt_7  -4.804  0.784  -6.354  -3.254  &lt;0.001 </span></span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a><span class="co">#&gt;      trt_5     1.33   0.924  -0.494  3.155   0.152  </span></span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a><span class="co">#&gt;    lsm_ref_5  -4.15   0.659  -5.452  -2.849  &lt;0.001 </span></span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a><span class="co">#&gt;    lsm_alt_5  -2.82   0.646  -4.097  -1.543  &lt;0.001 </span></span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a><span class="co">#&gt;      trt_6    1.953   0.998  -0.018  3.924   0.052  </span></span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a><span class="co">#&gt;    lsm_ref_6  -6.09   0.715  -7.503  -4.677  &lt;0.001 </span></span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a><span class="co">#&gt;    lsm_alt_6  -4.137  0.701  -5.521  -2.752  &lt;0.001 </span></span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a><span class="co">#&gt;      trt_7    2.166   1.118  -0.045  4.376   0.055  </span></span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a><span class="co">#&gt;    lsm_ref_7  -6.974  0.821  -8.598  -5.351  &lt;0.001 </span></span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a><span class="co">#&gt;    lsm_alt_7  -4.809  0.781  -6.351  -3.266  &lt;0.001 </span></span>
 <span id="cb9-32"><a href="#cb9-32" tabindex="-1"></a><span class="co">#&gt;   --------------------------------------------------</span></span></code></pre></div>
 <p>The table of values shown in the print message for <code>poolObj</code> can also be extracted using the <code>as.data.frame()</code> function:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">as.data.frame</span>(poolObj)</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt;    parameter         est        se          lci        uci         pval</span></span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; 1      trt_4 -0.09180645 0.6826279 -1.439496841  1.2558839 8.931772e-01</span></span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; 2  lsm_ref_4 -1.61581996 0.4862316 -2.575771415 -0.6558685 1.093708e-03</span></span>
-<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; 3  lsm_alt_4 -1.70762640 0.4749573 -2.645319305 -0.7699335 4.262148e-04</span></span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt; 4      trt_5  1.34493768 0.9219833 -0.475928147  3.1658035 1.466015e-01</span></span>
-<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; 5  lsm_ref_5 -4.15842866 0.6573634 -5.456705877 -2.8601514 2.437207e-09</span></span>
-<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt; 6  lsm_alt_5 -2.81349097 0.6448906 -4.087227225 -1.5397547 2.311851e-05</span></span>
-<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt; 7      trt_6  1.97129900 0.9968669  0.002040209  3.9405578 4.976605e-02</span></span>
-<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; 8  lsm_ref_6 -6.10474151 0.7172685 -7.521929894 -4.6875531 1.599139e-14</span></span>
-<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; 9  lsm_alt_6 -4.13344251 0.7048272 -5.526206458 -2.7406786 2.804784e-08</span></span>
-<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt; 10     trt_7  2.20455985 1.1178725 -0.004803107  4.4139228 5.049358e-02</span></span>
-<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">#&gt; 11 lsm_ref_7 -7.00813873 0.8301765 -8.650371217 -5.3659062 4.992283e-14</span></span>
-<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="co">#&gt; 12 lsm_alt_7 -4.80357888 0.7841600 -6.353648366 -3.2535094 8.310599e-09</span></span></code></pre></div>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt;    parameter         est        se         lci        uci         pval</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; 1      trt_4 -0.09180645 0.6826279 -1.43949684  1.2558839 8.931772e-01</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; 2  lsm_ref_4 -1.61581996 0.4862316 -2.57577141 -0.6558685 1.093708e-03</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; 3  lsm_alt_4 -1.70762640 0.4749573 -2.64531931 -0.7699335 4.262148e-04</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt; 4      trt_5  1.33036878 0.9239311 -0.49439426  3.1551318 1.518620e-01</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; 5  lsm_ref_5 -4.15040536 0.6590542 -5.45206801 -2.8487427 2.847887e-09</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt; 6  lsm_alt_5 -2.82003658 0.6464215 -4.09683850 -1.5432347 2.319168e-05</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt; 7      trt_6  1.95324204 0.9976499 -0.01761942  3.9241035 5.205766e-02</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; 8  lsm_ref_6 -6.08995154 0.7153681 -7.50333618 -4.6765669 1.545921e-14</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; 9  lsm_alt_6 -4.13670950 0.7007487 -5.52128259 -2.7521364 2.275505e-08</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt; 10     trt_7  2.16554484 1.1184001 -0.04484704  4.3759367 5.476906e-02</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">#&gt; 11 lsm_ref_7 -6.97430508 0.8210463 -8.59804208 -5.3505681 3.164128e-14</span></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="co">#&gt; 12 lsm_alt_7 -4.80876024 0.7805370 -6.35149800 -3.2660225 6.806194e-09</span></span></code></pre></div>
 <p>These outputs gives an estimated difference of
-2.205 (95% CI -0.005 to 4.414)
-between the two groups at the last visit with an associated p-value of 0.050.</p>
+2.166 (95% CI -0.045 to 4.376)
+between the two groups at the last visit with an associated p-value of 0.055.</p>
 </div>
 <div id="code" class="section level1" number="7">
 <h1><span class="header-section-number">7</span> Code</h1>
